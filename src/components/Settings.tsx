@@ -1,25 +1,15 @@
 import React, { useState, ChangeEvent, MouseEvent } from 'react';
 import { useOctokit } from '../hooks/octokitAPI.hook';
 import { useHttp } from '../hooks/http.hook';
+import { Accordion, Icon, Dropdown, Input, Button } from 'semantic-ui-react';
 
-import { Accordion, Icon, Dropdown, Input, Button } from 'semantic-ui-react'
-
-const Settings = ({setData}) => {
+const Settings = ({setData, setBlacklist, setLogin, login}) => {
+	const [reqestOctokit] = useOctokit();
+	const [request] = useHttp();
 	const [activeIndex, setActiveIndex] = useState<number>(2);
-	const [options, setOptions] = useState<
-		Array<object>
-	>([
-		// { key: 'af', value: 'af', text: 'Afghanistan ggfr' },
-		// { key: 'ax', value: 'ax', text: 'Aland Islands gfg' },
-		// { key: 'al', value: 'al', text: 'Albania gfg' },
-		// { key: 'dz', value: 'dz', text: 'Algeria gff' },
-	]);
-	const [login, setLogin] = useState<string>(''); 
+	const [options, setOptions] = useState<Array<object>>([]);
 	const [repo, setRepo] = useState<string>('');
 	const [error, setError] = useState<boolean>(false);
-	const [blacklist, setBlacklist] = useState<
-		Array<string>
-	>([]);
 
 	type DropdownProps = {
 		value: Array<string>;
@@ -37,10 +27,7 @@ const Settings = ({setData}) => {
 	const handleChangeList = (e: ChangeEvent, { value }: DropdownProps): void => {
 		setBlacklist(value)
 	}
-
-	const [reqestOctokit] = useOctokit();
-	const [request] = useHttp();
-	// 'UginB', 'js-part-1'
+	
 	const handleLoadCantributers = () => {
 		if (login && repo) {
 			setError(false);
@@ -48,9 +35,12 @@ const Settings = ({setData}) => {
 			.then((res) => {
 				request(res.data.contributors_url)
 					.then((response) => {
+						console.log(response)
 						setData(response)
-						// setOptions(response.filter(item => item.login !== login).map(item => item.key = item.id))
-						console.log(response.map(item => item = {key: 'af', value: 'af', text: 'Afghanistan ggfr'}))
+						setOptions(
+							response
+								.filter(item => item.login !== login)
+								.map(item => item = {key: item.id, value: item.login, text: item.login}))
 					}).catch((e) => {
 						setError(true);
 						throw new Error(`Ошибка сервера: ${e}`)
