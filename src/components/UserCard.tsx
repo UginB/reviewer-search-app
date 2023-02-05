@@ -3,12 +3,13 @@ import { Card, Icon, Image } from 'semantic-ui-react'
 
 import searchImg from '../img/search.png';
 
-const UserCard = ({position}) => {
+const UserCard = ({position, data}) => {
+	// console.log(data[0].login)
 	return(
 		<Card>
 			<Image src={searchImg} wrapped ui={false} />
 			<Card.Content>
-			<Card.Header>Matthew</Card.Header>
+			{/* <Card.Header>Matthew {data[0].login}</Card.Header> */}
 			<Card.Meta>
 				{position}
 			</Card.Meta>
