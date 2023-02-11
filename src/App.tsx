@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import Header from './components/Header';
 import Main from './components/Main';
@@ -25,7 +24,6 @@ function App() {
 				<SearchOutput 
 					userData={userData}
 					blacklist={blacklist}
-					login={login}
 					contributors={contributors}/>
 				<Settings 
 					setUserData={setUserData}

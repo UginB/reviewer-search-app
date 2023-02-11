@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent, MouseEvent } from 'react';
+import { useEffect, useState, SyntheticEvent, MouseEvent } from 'react';
 import { useOctokit } from '../hooks/octokitAPI.hook';
 import { useHttp } from '../hooks/http.hook';
 import { useLocalStorage } from '../hooks/localStorage.hook';
@@ -12,6 +12,7 @@ const Settings = ({setUserData, setBlacklist, setLogin, login, contributors, set
 	const [repo, setRepo] = useState<string>('');
 	const [error, setError] = useState<boolean>(false);
 	const [setLocalStorageItem, setLocalStorageObjItem] = useLocalStorage();
+	
 	useEffect(() => {
 		if(localStorage.getItem('login') && localStorage.getItem('repo') && localStorage.getItem('user') && localStorage.getItem('repo')) {
 			setLogin(localStorage.getItem('login'));
@@ -30,12 +31,12 @@ const Settings = ({setUserData, setBlacklist, setLogin, login, contributors, set
 		index: number;
 	}
 
-	const handleClick = ( e: MouseEvent<HTMLDivElement, MouseEvent>, { index }: AccordionProps ): void => {
+	const handleClick = ( e: MouseEvent | TouchEvent, { index }: AccordionProps ): void => {
 		const newIndex = activeIndex === index ? -1 : index
 		setActiveIndex(newIndex);
 	}
 
-	const handleChangeList = (e: ChangeEvent, { value }: DropdownProps): void => {
+	const handleChangeList = (e: SyntheticEvent<HTMLElement, Event>, { value }: DropdownProps): void => {
 		setBlacklist(value)
 	}
 	
@@ -53,7 +54,7 @@ const Settings = ({setUserData, setBlacklist, setLogin, login, contributors, set
 						const cntrbtrs = response.filter(item => item.login !== login);
 						setLocalStorageObjItem('contributors', cntrbtrs);
 						setContributors(cntrbtrs);
-						setOptions(contributors.map(item => item = {key: item.id, value: item.login, text: item.login}))
+						setOptions(cntrbtrs.map(item => item = {key: item.id, value: item.login, text: item.login}))
 					}).catch((e) => {
 						setError(true);
 						throw new Error(`Ошибка сервера: ${e}`)

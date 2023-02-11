@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import UserCard from './UserCard';
 import { Card, Button } from 'semantic-ui-react';
 
 import searchImg from '../img/search.png';
 
-const SearchOutput = ({userData, blacklist, login, contributors}) => {
+const SearchOutput = ({userData, blacklist, contributors}) => {
 	const [user, setUser] = useState({
 		login: 'нет авторизации',
 		avatar_url: searchImg,

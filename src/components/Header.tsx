@@ -1,4 +1,3 @@
-import React from 'react';
 import { Header as HeaderElem } from 'semantic-ui-react';
 
 const Header = () => {
