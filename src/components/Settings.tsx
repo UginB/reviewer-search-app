@@ -1,15 +1,26 @@
-import React, { useState, ChangeEvent, MouseEvent } from 'react';
+import React, { useEffect, useState, ChangeEvent, MouseEvent } from 'react';
 import { useOctokit } from '../hooks/octokitAPI.hook';
 import { useHttp } from '../hooks/http.hook';
+import { useLocalStorage } from '../hooks/localStorage.hook';
 import { Accordion, Icon, Dropdown, Input, Button } from 'semantic-ui-react';
 
-const Settings = ({setData, setBlacklist, setLogin, login}) => {
+const Settings = ({setUserData, setBlacklist, setLogin, login, contributors, setContributors}) => {
 	const [reqestOctokit] = useOctokit();
 	const [request] = useHttp();
 	const [activeIndex, setActiveIndex] = useState<number>(2);
 	const [options, setOptions] = useState<Array<object>>([]);
 	const [repo, setRepo] = useState<string>('');
 	const [error, setError] = useState<boolean>(false);
+	const [setLocalStorageItem, setLocalStorageObjItem] = useLocalStorage();
+	useEffect(() => {
+		if(localStorage.getItem('login') && localStorage.getItem('repo') && localStorage.getItem('user') && localStorage.getItem('repo')) {
+			setLogin(localStorage.getItem('login'));
+			setRepo(localStorage.getItem('repo') || '');
+			setUserData(JSON.parse(localStorage.getItem('user') || ''));
+			setOptions(JSON.parse(localStorage.getItem('contributors') || '').map(item => item = {key: item.id, value: item.login, text: item.login}))
+			setContributors(JSON.parse(localStorage.getItem('contributors') || ''));
+		}
+	}, []);
 
 	type DropdownProps = {
 		value: Array<string>;
@@ -19,9 +30,9 @@ const Settings = ({setData, setBlacklist, setLogin, login}) => {
 		index: number;
 	}
 
-	const handleClick = (e: MouseEvent<HTMLDivElement, MouseEvent>, { index }: AccordionProps ): void => {
+	const handleClick = ( e: MouseEvent<HTMLDivElement, MouseEvent>, { index }: AccordionProps ): void => {
 		const newIndex = activeIndex === index ? -1 : index
-		setActiveIndex(newIndex)
+		setActiveIndex(newIndex);
 	}
 
 	const handleChangeList = (e: ChangeEvent, { value }: DropdownProps): void => {
@@ -31,16 +42,18 @@ const Settings = ({setData, setBlacklist, setLogin, login}) => {
 	const handleLoadCantributers = () => {
 		if (login && repo) {
 			setError(false);
+			setLocalStorageItem('login', login);
+			setLocalStorageItem('repo', repo);
 			reqestOctokit(login, repo)
 			.then((res) => {
+				setUserData(res.data)
+				setLocalStorageObjItem('user', res.data);
 				request(res.data.contributors_url)
 					.then((response) => {
-						console.log(response)
-						setData(response)
-						setOptions(
-							response
-								.filter(item => item.login !== login)
-								.map(item => item = {key: item.id, value: item.login, text: item.login}))
+						const cntrbtrs = response.filter(item => item.login !== login);
+						setLocalStorageObjItem('contributors', cntrbtrs);
+						setContributors(cntrbtrs);
+						setOptions(contributors.map(item => item = {key: item.id, value: item.login, text: item.login}))
 					}).catch((e) => {
 						setError(true);
 						throw new Error(`Ошибка сервера: ${e}`)
@@ -62,7 +75,7 @@ const Settings = ({setData, setBlacklist, setLogin, login}) => {
 			<Accordion.Title
 				active={activeIndex === 2}
 				index={2}
-				onClick={() => handleClick}
+				onClick={handleClick}
 			>
 			<Icon name='dropdown' />
 				Настройки
@@ -97,7 +110,7 @@ const Settings = ({setData, setBlacklist, setLogin, login}) => {
 						selection 
 						options={options} 
 						multiple 
-						onChange={() => handleChangeList}/>
+						onChange={handleChangeList}/>
 				</div>
 			</Accordion.Content>
       	</Accordion>

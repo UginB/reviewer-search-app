@@ -12,23 +12,28 @@ import './App.css';
 import 'semantic-ui-css/semantic.min.css'
 
 function App() {
-	const [data, setData] = useState([]);
+	const [userData, setUserData] = useState({});
 	const [blacklist, setBlacklist] = useState<Array<string>>([]);
 	const [login, setLogin] = useState<string>('');
+	const [contributors, setContributors] = useState<Array<object>>([]);
 // 'UginB', 'js-part-1'
+// 'facebook', 'react'
 	return (
 		<Container style={{height: '100vh'}}>
 			<Header/>
 			<Main>
 				<SearchOutput 
-					data={data}
+					userData={userData}
 					blacklist={blacklist}
-					login={login}/>
+					login={login}
+					contributors={contributors}/>
 				<Settings 
-					setData={setData}
+					setUserData={setUserData}
 					setBlacklist={setBlacklist}
 					setLogin={setLogin}
-					login={login}/>
+					login={login}
+					contributors={contributors}
+					setContributors={setContributors}/>
 			</Main>
 			<Footer/>
 		</Container>
