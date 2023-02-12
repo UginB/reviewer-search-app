@@ -1,50 +1,39 @@
-import { useEffect, useState } from 'react';
-import { useLocalStorage } from '../hooks/localStorage.hook';
+import { useCallback, useEffect, useState } from 'react';
 import { connect } from "react-redux";
 import * as actions from '../store/actions';
+import { State, Contributor, UserData, ReviewerData } from '../store/reducer';
 import UserCard from './UserCard';
 import { Card, Button } from 'semantic-ui-react';
-import { State } from '../store/reducer';
-import searchImg from '../img/search.png';
-import { Contributor, UserData } from '../store/reducer';
 
 type SearchOutputProps = {
 	userData: UserData,
+	reviewer: ReviewerData,
 	blacklist: Array<object>,
-	contributors: Array<Contributor>
+	contributors: Array<Contributor>,
+	setReviewer: Function
 }
 
-const SearchOutput = ({userData, blacklist, contributors}: SearchOutputProps): JSX.Element => {
-	const [user, setUser] = useState({
-		login: 'нет авторизации',
-		avatar_url: searchImg,
-		html_url: `https://github.com/`,
-	})
-	const [reviewer, setReviewer] = useState({
-		login: 'неизвестен',
-		avatar_url: searchImg,
-		html_url: `https://github.com/`,
-	})
+type searchListType = {
+	login: string,
+	avatar_url: string,
+	html_url: string
+}
 
-	type searchListType = {
-		login: string,
-		avatar_url: string,
-		html_url: string
-	}
-
+const SearchOutput = ({userData, reviewer, blacklist, contributors, setReviewer}: SearchOutputProps): JSX.Element => {
 	const [loadingReviewer, setLoadingReviewer] = useState<boolean>(false);
 	const [searchList, setSearchList] = useState<Array<searchListType>>([]);
-	const [setLocalStorageItem, setLocalStorageObjItem] = useLocalStorage();
-	
-	useEffect(() => {
-		if(userData) {
-			setUser({
-				login: userData.owner.login,
-				avatar_url: userData.owner.avatar_url,
-				html_url: userData.owner.html_url,
+
+	const showRandomReviewer = useCallback(() =>  {
+		if (contributors) {
+			let count = Math.floor(Math.random() * (contributors.length - 1 + 1))
+			setReviewer({
+				login: searchList[count].login,
+				avatar_url: searchList[count].avatar_url,
+				html_url: searchList[count].html_url,
 			})
 		}
-	}, [userData]);
+		}, [contributors, searchList, setReviewer]
+	)
 
 	useEffect(() => {
 		if(contributors) {
@@ -56,29 +45,14 @@ const SearchOutput = ({userData, blacklist, contributors}: SearchOutputProps): J
 
 	useEffect(() => {
 		let searchInterval: NodeJS.Timer;
-		if (loadingReviewer) {
-			searchInterval = setInterval(() => {
-				showRandomReviewer()
-		  }, 200);
-		}
+		if (loadingReviewer) searchInterval = setInterval(showRandomReviewer, 200);
 	
 		return () => {
-		  clearInterval(searchInterval);
+		  	clearInterval(searchInterval);
 		};
-	  }, [loadingReviewer]);
-
-	const showRandomReviewer = () =>  {
-		if (contributors) {
-			let count = Math.floor(Math.random() * (contributors.length - 1 + 1))
-			setReviewer({
-				login: searchList[count].login,
-				avatar_url: searchList[count].avatar_url,
-				html_url: searchList[count].html_url,
-			})
-		}
-	}
+	}, [loadingReviewer, showRandomReviewer]);
 	
-	const handleClick = () => {
+	const handleClick = ():void => {
 		setLoadingReviewer(true);
 		setTimeout(() => setLoadingReviewer(false), 2000);
 	}
@@ -88,9 +62,9 @@ const SearchOutput = ({userData, blacklist, contributors}: SearchOutputProps): J
 			<Card.Group>
 				<UserCard 
 					position={'ЭТО ВЫ'}  
-					img={user.avatar_url} 
-					login={user.login}
-					githubUrl={user.html_url}/>
+					img={userData.owner.avatar_url} 
+					login={userData.owner.login}
+					githubUrl={userData.owner.html_url}/>
 				<UserCard 
 					position={'ВАШ РАНДОМНЫЙ РЕВЬЮЕР'}
 					img={reviewer.avatar_url} 
@@ -111,11 +85,10 @@ const SearchOutput = ({userData, blacklist, contributors}: SearchOutputProps): J
 const mapStateToProps = (state: State) => {
     return {
         userData: state.userData,
+		reviewer: state.reviewer,
 		blacklist: state.blacklist,
 		contributors: state.contributors
     }
 }
 
 export default connect(mapStateToProps, actions)(SearchOutput);
-
-// export default SearchOutput;

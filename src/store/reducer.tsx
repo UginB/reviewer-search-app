@@ -1,4 +1,3 @@
-import { Reducer } from 'react';
 import searchImg from '../img/search.png';
 
 const initialState: State = {
@@ -9,6 +8,11 @@ const initialState: State = {
 			html_url: `https://github.com/`,
 		},
 		contributors_url: null
+	},
+	reviewer: {
+		login: 'неизвестен',
+		avatar_url: searchImg,
+		html_url: `https://github.com/`,
 	},
 	blacklist: [],
 	contributors: [],
@@ -43,6 +47,15 @@ const reducer = (state: State = initialState, action: Action) => {
 				...state,
 				repo: action.payload
 			};
+		case "SET_REVIWER":
+			return {
+				...state,
+				reviewer: action.payload
+			};
+		case "SET_APP_STATE":
+			return {
+				...action.payload
+			};
         default:
             return state;
     }
@@ -55,6 +68,12 @@ export type UserData = {
 		html_url: string
 	},
 	contributors_url: string | null
+}
+
+export type ReviewerData = {
+	login: string,
+	avatar_url: string,
+	html_url: string
 }
 
 export type Contributor = {
@@ -81,6 +100,7 @@ export type Contributor = {
 
 export type State = {
 	userData: UserData,
+	reviewer: ReviewerData,
 	blacklist: Array<object>,
 	contributors: Array<Contributor>
 	login: string,
