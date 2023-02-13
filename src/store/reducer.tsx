@@ -54,7 +54,8 @@ const reducer = (state: State = initialState, action: Action) => {
 			};
 		case "SET_APP_STATE":
 			return {
-				...action.payload
+				...action.payload, 
+				blacklist: []
 			};
         default:
             return state;
@@ -101,7 +102,7 @@ export type Contributor = {
 export type State = {
 	userData: UserData,
 	reviewer: ReviewerData,
-	blacklist: Array<object>,
+	blacklist: Array<Contributor>,
 	contributors: Array<Contributor>
 	login: string,
 	repo: string

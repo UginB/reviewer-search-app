@@ -1,4 +1,4 @@
-import { type } from 'os';
+import { FC } from 'react';
 import { Card, Icon, Image } from 'semantic-ui-react'
 
 type UserCardProps = {
@@ -8,7 +8,7 @@ type UserCardProps = {
 	githubUrl: string
 }
 
-const UserCard: React.FC<any> = ({position, img, login, githubUrl}: UserCardProps): JSX.Element => {
+const UserCard: FC<UserCardProps> = ({position, img, login, githubUrl}): JSX.Element => {
 	return(
 		<Card>
 			<Image 

@@ -1,10 +1,10 @@
-import { ReactNode } from "react";
+import { ReactNode, FC } from "react";
 
 type MainType = {
 	children: ReactNode;
 };
 
-const Main = ({children}: MainType): JSX.Element => {
+const Main: FC<MainType> = ({children}): JSX.Element => {
 	return(
 		<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
 			{children}

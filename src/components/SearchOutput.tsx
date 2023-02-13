@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, FC } from 'react';
 import { connect } from "react-redux";
 import * as actions from '../store/actions';
 import { State, Contributor, UserData, ReviewerData } from '../store/reducer';
@@ -19,24 +19,25 @@ type searchListType = {
 	html_url: string
 }
 
-const SearchOutput = ({userData, reviewer, blacklist, contributors, setReviewer}: SearchOutputProps): JSX.Element => {
+const SearchOutput: FC<SearchOutputProps> = ({userData, reviewer, blacklist, contributors, setReviewer}): JSX.Element => {
 	const [loadingReviewer, setLoadingReviewer] = useState<boolean>(false);
 	const [searchList, setSearchList] = useState<Array<searchListType>>([]);
+	const [error, setError] = useState<boolean>(false);
 
 	const showRandomReviewer = useCallback(() =>  {
 		if (contributors) {
-			let count = Math.floor(Math.random() * (contributors.length - 1 + 1))
+			let count = Math.floor(Math.random() * ((contributors.length - blacklist.length - 1) - 0 + 1) + 0);
 			setReviewer({
 				login: searchList[count].login,
 				avatar_url: searchList[count].avatar_url,
 				html_url: searchList[count].html_url,
 			})
 		}
-		}, [contributors, searchList, setReviewer]
-	)
+	}, [searchList]);
 
 	useEffect(() => {
-		if(contributors) {
+		setError(false);
+		if(contributors.length > 0) {
 			setSearchList(
 				contributors.filter((item) => !new Set(blacklist).has(item.login as String))
 			)
@@ -53,8 +54,13 @@ const SearchOutput = ({userData, reviewer, blacklist, contributors, setReviewer}
 	}, [loadingReviewer, showRandomReviewer]);
 	
 	const handleClick = ():void => {
-		setLoadingReviewer(true);
-		setTimeout(() => setLoadingReviewer(false), 2000);
+		if (blacklist.length !== contributors.length) {
+			setError(false);
+			setLoadingReviewer(true);
+			setTimeout(() => setLoadingReviewer(false), 2000);
+		} else {
+			setError(true);
+		}
 	}
 
 	return(
@@ -72,12 +78,14 @@ const SearchOutput = ({userData, reviewer, blacklist, contributors, setReviewer}
 					githubUrl={reviewer.html_url}/>
 			</Card.Group>
 			<Button 
+				disabled={loadingReviewer}
 				inverted 
 				color='red' 
 				onClick={handleClick}
 				style={{marginTop: '15px'}}>
 				НАЙТИ РЕВЬЮЕРА
 			</Button>
+			{(error) ? <div style={{color: 'red'}}>нет контрбьюторов или они все в черном списке</div> : null}
 		</>
 	)
 }

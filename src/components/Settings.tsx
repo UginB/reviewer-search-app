@@ -1,4 +1,4 @@
-import { useEffect, useState, SyntheticEvent, MouseEvent } from 'react';
+import { useEffect, useState, FC } from 'react';
 import { useOctokit } from '../hooks/octokitAPI.hook';
 import { useHttp } from '../hooks/http.hook';
 import { connect } from "react-redux";
@@ -8,7 +8,8 @@ import { Accordion, Icon, Dropdown, Input, Button } from 'semantic-ui-react';
 
 type SettingsProps = {
 	login: string | undefined, 
-	repo: string | undefined, 
+	repo: string | undefined,
+	contributors: Array<Contributor>,
 	setUserData: Function, 
 	setBlacklist: Function, 
 	setLogin: Function, 
@@ -16,35 +17,20 @@ type SettingsProps = {
 	setRepo: Function
 }
 
-type DropdownProps = {
-	value: Array<string>;
-}
-
-type AccordionProps = {
-	index: number;
-}
-
-const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContributors, setRepo}: SettingsProps): JSX.Element => {
+const Settings: FC<SettingsProps> = ({login, repo, contributors, setUserData, setBlacklist, setLogin, setContributors, setRepo}): JSX.Element => {
 	const [reqestOctokit] = useOctokit();
 	const [request] = useHttp();
 	const [activeIndex, setActiveIndex] = useState<number>(2);
 	const [options, setOptions] = useState<Array<object>>([]);
 	const [error, setError] = useState<boolean>(false);
-	
-	useEffect(() => {
-		if(localStorage.getItem('login') && localStorage.getItem('repo') && localStorage.getItem('user') && localStorage.getItem('repo')) {
-			let cntr: Array<Contributor> = JSON.parse(localStorage.getItem('contributors') as string)
-			setOptions(cntr.map(item => {return {key: item.id, value: item.login, text: item.login}}))
-		}
-	}, []);
 
-	const handleClick = ( e: MouseEvent | TouchEvent, { index }: AccordionProps ): void => {
-		const newIndex = activeIndex === index ? -1 : index
+	useEffect(() => setOptions(
+		contributors.map(item => {return {key: item.id, value: item.login, text: item.login}})
+	), [contributors]);
+
+	const handleClick = (): void => {
+		const newIndex = activeIndex === 2 ? -1 : 2
 		setActiveIndex(newIndex);
-	}
-
-	const handleChangeList = (e: SyntheticEvent<HTMLElement, Event>, { value }: DropdownProps): void => {
-		setBlacklist(value)
 	}
 	
 	const handleLoadCantributers = () => {
@@ -52,14 +38,10 @@ const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContribu
 			setError(false);
 			reqestOctokit(login, repo)
 			.then((res) => {
-				console.log(res.data)
 				setUserData(res.data)
 				request(res.data.contributors_url)
 					.then((response: Array<Contributor>) => {
-						const cntrbtrs = response.filter(item => item.login !== login);
-						console.log(cntrbtrs)
-						setContributors(cntrbtrs);
-						setOptions(cntrbtrs.map(item => {return {key: item.id, value: item.login, text: item.login}}))
+						setContributors(response.filter(item => item.login !== login));
 					}).catch((e) => {
 						setError(true);
 						throw new Error(`Ошибка сервера: ${e}`)
@@ -71,7 +53,7 @@ const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContribu
 		} else {
 			setError(true);
 		}
-	}
+	};
 
 	return (
 		<Accordion 
@@ -80,8 +62,7 @@ const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContribu
 			style={{maxWidth: '500px', marginTop: '15px'}}>
 			<Accordion.Title
 				active={activeIndex === 2}
-				index={2}
-				onClick={() => handleClick}
+				onClick={handleClick}
 			>
 			<Icon name='dropdown' />
 				Настройки
@@ -115,8 +96,8 @@ const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContribu
 						search 
 						selection 
 						options={options} 
-						multiple 
-						onChange={() => handleChangeList}/>
+						multiple
+						onChange={(e, props) => setBlacklist(props.value)}/>
 				</div>
 			</Accordion.Content>
       	</Accordion>
@@ -125,7 +106,8 @@ const Settings = ({login, repo, setUserData, setBlacklist, setLogin, setContribu
 
 const mapStateToProps = (state: State) => ({
 	login: state.login,
-	repo: state.repo
+	repo: state.repo,
+	contributors: state.contributors
 })
 
 export default connect(mapStateToProps, actions)(Settings);
