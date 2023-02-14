@@ -85,7 +85,7 @@ const SearchOutput: FC<SearchOutputProps> = ({userData, reviewer, blacklist, con
 				style={{marginTop: '15px'}}>
 				НАЙТИ РЕВЬЮЕРА
 			</Button>
-			{(error) ? <div style={{color: 'red'}}>нет контрбьюторов или они все в черном списке</div> : null}
+			{(error) ? <div style={{color: 'red'}}>не заданы настройки, нет контрбьюторов или они все в черном списке</div> : null}
 		</>
 	)
 }

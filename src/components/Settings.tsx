@@ -88,7 +88,7 @@ const Settings: FC<SettingsProps> = ({login, repo, contributors, setUserData, se
 						color='green'
 						style={{margin: '15px 0'}}
 						onClick={handleLoadCantributers}>
-						Загрузить список кантибьютеров
+						Авторизироваться и загрузить список кантибьютеров
 					</Button>
 					<Dropdown 
 						placeholder='Добавить в ЧС' 
