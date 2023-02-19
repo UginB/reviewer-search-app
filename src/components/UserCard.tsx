@@ -8,7 +8,7 @@ type UserCardProps = {
 	githubUrl: string
 }
 
-const UserCard: FC<UserCardProps> = ({position, img, login, githubUrl}): JSX.Element => {
+const UserCard: FC<UserCardProps> = ({position, img, login, githubUrl}) => {
 	return(
 		<Card>
 			<Image 

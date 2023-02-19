@@ -1,6 +1,6 @@
 import searchImg from '../img/search.png';
 
-const initialState: State = {
+export const initialState: State = {
 	userData: {
 		owner: {
 			login: 'нет авторизации',
@@ -102,7 +102,7 @@ export type Contributor = {
 export type State = {
 	userData: UserData,
 	reviewer: ReviewerData,
-	blacklist: Array<Contributor>,
+	blacklist: Array<string>,
 	contributors: Array<Contributor>
 	login: string,
 	repo: string

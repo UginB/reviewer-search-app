@@ -4,7 +4,7 @@ type MainType = {
 	children: ReactNode;
 };
 
-const Main: FC<MainType> = ({children}): JSX.Element => {
+const Main: FC<MainType> = ({children}) => {
 	return(
 		<div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
 			{children}
