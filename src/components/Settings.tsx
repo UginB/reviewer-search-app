@@ -1,10 +1,10 @@
-import { useEffect, useState, FC } from 'react';
+import { useMemo, useState, FC } from 'react';
 import { reqestOctokit } from '../hooks/octokitAPI.hook';
 import { request } from '../hooks/http.hook';
 import { useDispatch, useSelector } from "react-redux";
 import { State, Contributor } from '../store/reducer';
 import { setUserData, setBlacklist, setLogin, setContributors, setRepo } from '../store/actions';
-import { Accordion, Icon, Dropdown, Input, Button } from 'semantic-ui-react';
+import { Accordion, Icon, Dropdown, Input, Button, DropdownItemProps } from 'semantic-ui-react';
 
 const Settings: FC = () => {
 	const dispatch = useDispatch();
@@ -12,17 +12,11 @@ const Settings: FC = () => {
 	const repo = useSelector((state: State) => state.repo);
 	const contributors = useSelector((state: State) => state.contributors);
 	const [dropdownOpened, setDropdownOpened] = useState<boolean>(true);
-	const [options, setOptions] = useState<Array<object>>([]);
 	const [error, setError] = useState<boolean>(false);
 
-	useEffect(() => setOptions(
-		contributors.map(item => {return {key: item.id, value: item.login, text: item.login}})
-	), [contributors]);
-
-	const handleClick = (): void => {
-		const newIndex = dropdownOpened === true ? false : true
-		setDropdownOpened(newIndex);
-	}
+	const optionsContributers: Array<DropdownItemProps> = useMemo(() => {
+		return contributors.map(item => {return {key: item.id, value: item.login, text: item.login}})
+	}, [contributors])
 	
 	const handleLoadCantributers = () => {
 		if (login && repo) {
@@ -53,7 +47,7 @@ const Settings: FC = () => {
 			style={{maxWidth: '500px', marginTop: '15px'}}>
 			<Accordion.Title
 				active={dropdownOpened === true}
-				onClick={handleClick}
+				onClick={() => setDropdownOpened(!dropdownOpened)}
 			>
 			<Icon name='dropdown' />
 				Настройки
@@ -86,7 +80,7 @@ const Settings: FC = () => {
 						fluid 
 						search 
 						selection 
-						options={options} 
+						options={optionsContributers} 
 						multiple
 						onChange={(e, props) => dispatch(setBlacklist(props.value as string[]))}/>
 				</div>

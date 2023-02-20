@@ -24,7 +24,7 @@ const SearchOutput: FC = () => {
 	
 	const showRandomReviewer = useCallback(() =>  {
 		if (contributors) {
-			let count = Math.floor(Math.random() * ((contributors.length - blacklist.length - 1) + 1));
+			let count = Math.floor(Math.random() * (searchList.length - 1));
 			dispatch(setReviewer({
 				login: searchList[count].login,
 				avatar_url: searchList[count].avatar_url,
