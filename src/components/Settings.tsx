@@ -1,4 +1,4 @@
-import { useMemo, useState, FC } from 'react';
+import { useState, FC } from 'react';
 import { reqestOctokit } from '../hooks/octokitAPI.hook';
 import { request } from '../hooks/http.hook';
 import { useDispatch, useSelector } from "react-redux";
@@ -14,9 +14,7 @@ const Settings: FC = () => {
 	const [dropdownOpened, setDropdownOpened] = useState<boolean>(true);
 	const [error, setError] = useState<boolean>(false);
 
-	const optionsContributers: Array<DropdownItemProps> = useMemo(() => {
-		return contributors.map(item => {return {key: item.id, value: item.login, text: item.login}})
-	}, [contributors])
+	const optionsContributers: Array<DropdownItemProps> = contributors.map((item) => {return {key: item.id, value: item.login, text: item.login}})
 	
 	const handleLoadCantributers = () => {
 		if (login && repo) {
