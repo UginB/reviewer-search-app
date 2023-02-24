@@ -1,13 +1,15 @@
 import { useState, FC } from 'react';
-import { reqestOctokit } from '../hooks/octokitAPI.hook';
-import { request } from '../hooks/http.hook';
 import { useDispatch, useSelector } from "react-redux";
-import { State, Contributor } from '../store/reducer';
-import { setUserData, setBlacklist, setLogin, setContributors, setRepo } from '../store/actions';
+import { AnyAction } from 'redux';
+import { State} from '../store/reducer';
+import { setBlacklist, setLogin, setRepo } from '../store/actions';
+import fetchUserData, { FetchUserDataFromGithub } from '../models/fetchUserData';
 import { Accordion, Icon, Dropdown, Input, Button, DropdownItemProps } from 'semantic-ui-react';
 
+type DispatchSettings = (arg: FetchUserDataFromGithub | AnyAction) => Promise<void>
+
 const Settings: FC = () => {
-	const dispatch = useDispatch();
+	const dispatch = useDispatch() as DispatchSettings;
 	const login = useSelector((state: State) => state.login);
 	const repo = useSelector((state: State) => state.repo);
 	const contributors = useSelector((state: State) => state.contributors);
@@ -19,19 +21,9 @@ const Settings: FC = () => {
 	const handleLoadCantributers = () => {
 		if (login && repo) {
 			setError(false);
-			reqestOctokit(login, repo)
-			.then((res) => {
-				dispatch(setUserData(res.data));
-				request(res.data.contributors_url)
-					.then((response: Array<Contributor>) => {
-						dispatch(setContributors(response.filter(item => item.login !== login)));
-					}).catch((e) => {
-						setError(true);
-						throw new Error(`Ошибка сервера: ${e}`)
-					})
-			}).catch((e) => {
+			dispatch(fetchUserData(login, repo))
+			.catch(() => {
 				setError(true);
-				throw new Error(`Ошибка сервера: ${e}`)
 			})
 		} else {
 			setError(true);
