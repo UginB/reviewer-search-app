@@ -17,7 +17,7 @@ export const initialState: State = {
 	blacklist: [],
 	contributors: [],
 	login: '',
-	repo: ''
+	repo: '',
 };
 
 const reducer = (state: State = initialState, action: Action) => {
