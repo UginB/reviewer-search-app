@@ -22,9 +22,9 @@ const Settings: FC = () => {
 		if (login && repo) {
 			setError(false);
 			dispatch(fetchUserData(login, repo))
-			.catch(() => {
-				setError(true);
-			})
+				.catch(() => {
+					setError(true);
+				})
 		} else {
 			setError(true);
 		}
